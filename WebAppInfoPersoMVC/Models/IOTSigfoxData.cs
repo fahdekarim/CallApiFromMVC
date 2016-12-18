@@ -9,7 +9,7 @@ namespace WebAppInfoPersoMVC.Models
     public class IOTSigfoxData
     {
         [JsonProperty(PropertyName = "data")]
-        List<IOTSigfox> data { get; set; }
+        public List<IOTSigfox> data { get; set; }
        
     }
 }

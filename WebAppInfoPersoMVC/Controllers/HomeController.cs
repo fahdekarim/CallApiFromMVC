@@ -60,10 +60,8 @@ namespace WebAppInfoPersoMVC.Controllers
  
                 var Employees = JsonConvert.DeserializeObject<IOTSigfoxData>(responseData);
                 //  TempData["id"]= Employees.Count;
-                IOTSigfoxData j = new IOTSigfoxData();
-                
-                
-                return View(Employees);
+            
+                return View(Employees.data);
             }
             return View("Error");
         }
