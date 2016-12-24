@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace WebAppInfoPersoMVC.Models
+namespace WebAppChat.Models
 {
     public class IOTSigfox
     {

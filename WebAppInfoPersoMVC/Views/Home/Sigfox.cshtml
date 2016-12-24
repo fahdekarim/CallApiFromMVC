@@ -9,6 +9,41 @@
 <p>
     @Html.ActionLink("Create New", "Create")
 </p>
+<div class="row">
+    Numbers of Online Users    <strong id="counter" > </strong>
+
+    <script src="~/scripts/jquery-1.10.2.js"></script>
+    <script src="~/scripts/jquery.signalR-2.2.1.js"></script>
+    <script src="~/signalr/hubs"></script>
+    <script>
+        $(
+                function ()
+                {
+                    //add jquery and signal-signalr js , it have to before ~/signalr/hubs
+                    //add jquery ~/signalr/hubs
+                    //setup hubs    
+                    var counterhub=$.connection.NotificationHub;//decalre variable for NotificationHub,
+                    //you can see the name of the hub difference, you can get right name when you view the link of ~/signalr/hubs
+                    $.connection.hub.start().done(
+                                                    function()
+                                                    {
+                                                        //do something after the hub connected
+                                                    }
+                    );
+
+                    //function to receive data from the server ,server call in on code behind
+                    counterhub.client.UpdateCount = function (counter)
+                    {
+                        $("#counter").text(counter);//i update trong tag have id as counter.
+                    }
+
+
+
+
+                }
+        );
+    </script>
+</div>
 <table class="table">
     <tr>
         <th>

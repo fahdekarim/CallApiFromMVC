@@ -7,17 +7,20 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
+using Microsoft.AspNet.SignalR;
+using Microsoft.AspNet.SignalR.Hubs;
 using System.Web.Mvc;
-using WebAppInfoPersoMVC.Models;
+using WebAppChat.Models;
 
-namespace WebAppInfoPersoMVC.Controllers
+namespace WebAppChat.Controllers
 {
     public class HomeController : Controller
     {
+
         // GET: Home
         HttpClient client;
-        
-        string urlAnExternalApi = "https://backend.sigfox.com/api/devices/17AA23/messages";  
+
+        string urlAnExternalApi = "https://backend.sigfox.com/api/devices/17AA23/messages";
         //The URL of the WEB API Service
         string urlAnInternalApi = "http://localhost:59897/api/infoperso";
         List<IOTSigfox> tmpdb;
@@ -37,10 +40,10 @@ namespace WebAppInfoPersoMVC.Controllers
 
             //si tmpdb est null ->initialisation  / sinon reaffecter l'ancienne
 
-         
 
-         
-          
+
+
+
 
         }
         public async Task<ActionResult> index()
@@ -58,13 +61,13 @@ namespace WebAppInfoPersoMVC.Controllers
             return View("Error");
         }
         // GET: EmployeeInfo
-       /* [HttpPost]
-        public void Sigfox(String device , string time , string data ,string snr, string lingQuality)
-        {
-            TempData["IOT"] = new IOTSigfox(device,time,data,snr,lingQuality);
-            RedirectToAction("Sigfox");
-        }
-        */
+        /* [HttpPost]
+         public void Sigfox(String device , string time , string data ,string snr, string lingQuality)
+         {
+             TempData["IOT"] = new IOTSigfox(device,time,data,snr,lingQuality);
+             RedirectToAction("Sigfox");
+         }
+         */
         [HttpPost]
         public void Sigfox(IOTSigfox iot)
         {
@@ -78,7 +81,7 @@ namespace WebAppInfoPersoMVC.Controllers
             if (responseMessage.IsSuccessStatusCode)
             {
                 var responseData = responseMessage.Content.ReadAsStringAsync().Result;
- 
+
                 var Employees = JsonConvert.DeserializeObject<IOTSigfoxData>(responseData);
                 //  TempData["id"]= Employees.Count;
                 //  if(!Employees.data.Contains((IOTSigfox)TempData["IOT"]))
@@ -95,17 +98,25 @@ namespace WebAppInfoPersoMVC.Controllers
                 {
                     tmpdb.Insert(0, new IOTSigfox(device, time, data, snr, linkQuality));
                     TempData["list"] = tmpdb;
+                    //Clients.All.PostFromTheCloud(device, time, data, snr, linkQuality);
+                    var hubContext = GlobalHost.ConnectionManager.GetHubContext<ChatHub>();
+                    if (hubContext != null)
+                    {
+                       
+                        hubContext.Clients.All.updateSigfox(device, time, data, snr, linkQuality);
+                    }
+
                 }
 
-                  /*  if (TempData["IOT"] != null)
-                    {
-                    tmpdb.Insert(0, new IOTSigfox(device, time, data, snr, lingQuality));
-                        //tmpdb.Insert(0,(IOTSigfox)TempData["IOT"]); //!tmpdb.Contains((IOTSigfox)TempData["IOT"]) &&
-                        TempData["IOT"] = null;
-                    }
-                    */
-                    return View(tmpdb);
-              
+                /*  if (TempData["IOT"] != null)
+                  {
+                  tmpdb.Insert(0, new IOTSigfox(device, time, data, snr, lingQuality));
+                      //tmpdb.Insert(0,(IOTSigfox)TempData["IOT"]); //!tmpdb.Contains((IOTSigfox)TempData["IOT"]) &&
+                      TempData["IOT"] = null;
+                  }
+                  */
+                return View(tmpdb);
+
                 //return View(Employees.data);
             }
             return View("Error");
@@ -116,8 +127,8 @@ namespace WebAppInfoPersoMVC.Controllers
         }
         public ActionResult Create()
         {
-              infoperso p = new infoperso();
-              p.Id = (int)TempData["id"];
+            infoperso p = new infoperso();
+            p.Id = (int)TempData["id"];
             return View(p);
         }
 
@@ -189,5 +200,4 @@ namespace WebAppInfoPersoMVC.Controllers
         }
 
     }
-
 }
